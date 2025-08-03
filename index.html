@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GoPay App</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <style>
+    /* Global Styles */
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:Arial,sans-serif;background:#fff;}
+    .page{display:none;}
+    .active{display:block;}
+
+    /* Register/Login Page Styles */
+    .help-text{text-align:right;padding:15px 20px;font-size:14px;color:orange;font-weight:bold;}
+    .logo-container{margin-top:10px;height:50px;overflow:hidden;position:relative;text-align:center;}
+    .logo{display:inline-block;font-size:40px;font-weight:bold;color:#ff4500;animation:moveLogo 1.5s linear infinite alternate;}
+    @keyframes moveLogo{0%{transform:translateX(-50px);}100%{transform:translateX(50px);}}
+    h2{text-align:center;font-size:18px;margin:20px 0;font-weight:normal;}
+    .form-container{width:90%;max-width:350px;margin:0 auto;text-align:center;}
+    input{display:block;width:100%;padding:15px;margin:12px 0;border:2px solid green;border-radius:25px;font-size:16px;outline:none;}
+    button.register-btn,button.login-btn{background-color:green;color:#fff;font-size:18px;border:none;border-radius:25px;padding:15px;width:100%;cursor:pointer;margin-top:10px;}
+    .login-text{margin-top:8px;font-size:12px;color:#333;}
+    .login-text a{color:green;font-weight:bold;text-decoration:none;cursor:pointer;}
+
+    /* Dashboard Page Styles */
+    body.dashboard-body{background-color:#f5f5f5;overflow-x:hidden;}
+    .container{max-width:430px;margin:auto;padding-bottom:50px;}
+    .header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px 10px;}
+    .profile-info{display:flex;align-items:center;gap:10px;font-weight:bold;color:#333;}
+    .profile-icon{width:40px;height:40px;border-radius:50%;background:#ddd;display:flex;justify-content:center;align-items:center;font-size:14px;color:#333;cursor:pointer;}
+    .profile-icon.has-image{background-size:cover;background-position:center;background-color:transparent;}
+    .profile-icon.has-image .initials{display:none;}
+    .profile-icon .initials{font-weight:bold;}
+    .bell-icon-container {
+      position: relative;
+      cursor: pointer;
+    }
+    .bell-icon{width:32px;height:32px; filter: grayscale(1);}
+    .notification-badge{
+      position: absolute;
+      top: 0;
+      right: 0;
+      background-color: red;
+      color: white;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 10px;
+      font-weight: bold;
+    }
+    .new-dashboard-card{background-color:#28a745;margin:10px 20px;border-radius:18px;color:white;padding:30px 20px;text-align:left;}
+    .new-dashboard-card .balance-label{font-size:16px;opacity:0.9;margin-bottom:5px;}
+    .new-dashboard-card .balance-amount{font-size:40px;font-weight:bold;margin-bottom:15px;}
+    .new-dashboard-card .rewards-info{font-size:16px;opacity:0.9;margin-bottom:30px;}
+    .new-dashboard-card .actions{display:flex;justify-content:center;gap:20px;}
+    .new-dashboard-card .action-button{background-color:rgba(255,255,255,0.2);border:none;border-radius:25px;color:white;padding:12px 25px;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:background-color 0.3s ease;width:150px;}
+    .new-dashboard-card .action-button:hover{background-color:rgba(255,255,255,0.3);}
+    .new-dashboard-card .action-button img{width:20px;height:20px;filter:invert(100%);}
+    .quick-links,.more-links{display:flex;justify-content:space-around;flex-wrap:wrap;padding:0 10px;}
+    .link-item{text-align:center;width:70px;margin:10px 5px;cursor:pointer;}
+    .link-item img{width:45px;height:45px;margin-bottom:5px;}
+    .link-item .label{font-size:13px;color:#333;}
+    .promo-banner-side{margin:20px 10px;border-radius:10px;overflow:hidden;position:relative;height:150px;}
+    .promo-banner-side img{width:100%;height:100%;object-fit:cover;border-radius:10px;display:block;position:absolute;top:0;right:-100%;animation:slideLeft 15s linear infinite;}
+    .promo-banner-side img:nth-child(2){animation-delay:5s;}
+    .promo-banner-side img:nth-child(3){animation-delay:10s;}
+    @keyframes slideLeft{0%{right:-100%;}10%{right:0%;}33%{right:0%;}43%{right:100%;}100%{right:100%;}}
+    
+    /* Removed the .whatsapp-support-btn styles */
+
+    /* Transfer Page Styles */
+    .transfer-header {
+      background-color: #00A859;
+      color: white;
+      padding: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .transfer-container {
+      padding: 20px;
+    }
+    .transfer-container h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #000;
+      text-align: left; /* Adjusted for this section */
+    }
+    .transfer-container input, .transfer-container select {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    .transfer-container select {
+      background-color: #fff;
+      color: #000;
+    }
+    .buy-code {
+      color: #00A859;
+      margin-bottom: 20px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .balance {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background-color: #00A859;
+      color: white;
+      border: none;
+      font-size: 16px;
+      font-weight: bold;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .submit-btn:hover {
+      background-color: #008F4F;
+    }
+
+    /* Success page */
+    #successPage {
+      display: none;
+      background-color: #ffffff;
+      height: 100vh;
+      width: 100vw;
+      position: fixed;
+      top: 0; left: 0;
+      overflow: hidden;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    #successPage .check-circle {
+      background-color: #008000;
+      color: white;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 40px;
+      position: relative;
+    }
+    #successPage .emoji-burst {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      background-color: #d0f0c0;
+      border-radius: 50%;
+      padding: 5px;
+      font-size: 18px;
+    }
+    #successPage h1 {
+      color: #008000;
+      margin-top: 20px;
+      font-size: 24px;
+    }
+    #successPage p {
+      margin: 10px;
+      font-size: 16px;
+      text-align: center;
+      max-width: 300px;
+    }
+    #successPage .success-label {
+      background-color: #e6ffe6;
+      color: #008000;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      margin-top: 10px;
+    }
+    #successPage .dashboard-btn {
+      background-color: #008000;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      font-size: 16px;
+      border-radius: 10px;
+      margin-top: 20px;
+      cursor: pointer;
+    }
+    #flowers {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .flower {
+      position: absolute;
+      font-size: 24px;
+      animation: fly 3s linear infinite;
+      opacity: 0;
+    }
+    @keyframes fly {
+      0% { transform: translateY(0) scale(1); opacity: 1; }
+      100% { transform: translateY(-600px) scale(1.5); opacity: 0; }
+    }
+
+    /* Popup */
+    #errorPopup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .popup-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+    }
+    .popup-content h3 {
+      margin-top: 0;
+      color: #000;
+    }
+    .popup-content p {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .popup-content button {
+      background: #00A859;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .close-popup {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 20px;
+      cursor: pointer;
+      color: #333;
+    }
+
+    /* Profile Page Styles */
+    #profilePage header {
+      background: #008000; /* green */
+      color: #fff;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    #profilePage header span {
+      margin-left: 8px;
+    }
+    #profilePage .profile-section {
+      text-align: center;
+      padding: 24px 16px 16px;
+    }
+    #profilePage .profile-avatar {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid #008000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto;
+      font-size: 48px;
+      color: #008000;
+      background: #f9f9f9;
+      cursor:pointer;
+    }
+    #profilePage .profile-avatar.has-image{background-size:cover;background-position:center;background-color:transparent;}
+    #profilePage .profile-avatar.has-image .initials{display:none;}
+    #profilePage .profile-avatar .initials{font-weight:bold;}
+    #profilePage .profile-name {
+      margin-top: 12px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    #profilePage .info-card {
+      background: #fff;
+      margin: 16px;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    #profilePage .info-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    #profilePage .info-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #00800022;
+      color: #008000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 10px;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    #profilePage .info-text {
+      display: flex;
+      flex-direction: column;
+      font-size: 14px;
+    }
+    #profilePage .info-text span:first-child {
+      font-weight: 500;
+      color: #666;
+    }
+    #profilePage .info-text span:last-child {
+      font-size: 16px;
+      font-weight: bold;
+    }
+    #profilePage .status-active {
+      color: #008000;
+    }
+    #profilePage .status-not {
+      color: #e74c3c;
+    }
+    #profilePage .logout-btn {
+      margin: 20px;
+      border: 2px solid #008000;
+      color: #008000;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      cursor: pointer;
+      background: #ffffff;
+    }
+    #profilePage footer {
+      text-align: center;
+      padding: 10px;
+      background: #f4f4f4;
+      color: #444;
+      font-size: 13px;
+      border-top: 2px solid #008000;
+    }
+
+    /* Logout Popup Styles */
+    #logoutPopup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .logout-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 350px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .logout-content h3 {
+      margin: 0;
+      font-size: 20px;
+      color: #333;
+    }
+    .logout-content p {
+      margin: 15px 0 25px;
+      color: #666;
+      font-size: 15px;
+    }
+    .logout-buttons {
+      display: flex;
+      justify-content: space-around;
+      gap: 15px;
+    }
+    .logout-buttons button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .logout-buttons .yes-btn {
+      background-color: #e74c3c;
+      color: #fff;
+    }
+    .logout-buttons .yes-btn:hover {
+      background-color: #c0392b;
+    }
+    .logout-buttons .no-btn {
+      background-color: #ecf0f1;
+      color: #333;
+      border: 1px solid #bdc3c7;
+    }
+    .logout-buttons .no-btn:hover {
+      background-color: #dcdcdc;
+    }
+    /* NEW STYLE from second code */
+    #earnMorePage {
+      background-color: #ffffff;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+    #earnMorePage h1 {
+      color: #000000;
+      font-size: 28px;
+      margin-top: 40px;
+    }
+    #earnMorePage p {
+      color: #333333;
+      font-size: 18px;
+      margin: 20px 0;
+      line-height: 1.5;
+    }
+    #earnMorePage .btn {
+      background-color: #28a745; /* green */
+      color: white;
+      border: none;
+      padding: 14px 30px;
+      font-size: 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 15px 0;
+      text-decoration: none;
+      display: inline-block;
+    }
+    #earnMorePage .btn:hover {
+      background-color: #218838;
+    }
+    #earnMorePage .section {
+      margin-bottom: 60px;
+    }
+
+    /* NEW STYLES for Join Group Page */
+    #joinGroupPage .page-container {
+      max-width: 600px;
+      width: 100%;
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin: auto;
+    }
+    #joinGroupPage .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    #joinGroupPage .back-arrow {
+      font-size: 24px;
+      color: #333;
+      margin-right: 15px;
+      cursor: pointer;
+    }
+    #joinGroupPage .header-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+    #joinGroupPage .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #7e22ce;
+      margin-bottom: 5px;
+    }
+    #joinGroupPage .subtitle {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 25px;
+    }
+    #joinGroupPage .channel-box {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    #joinGroupPage .channel-info {
+      display: flex;
+      align-items: center;
+    }
+    #joinGroupPage .icon-container {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #25d366;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 15px;
+    }
+    #joinGroupPage .channel-name {
+      font-size: 16px;
+      font-weight: 500;
+      color: #333;
+    }
+    #joinGroupPage .join-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      background-color: #25d366;
+      color: #fff;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    #joinGroupPage .join-button:hover {
+      background-color: #128c7e;
+    }
+    #joinGroupPage .join-button .icon {
+      margin-right: 8px;
+      width: 20px;
+      height: 20px;
+    }
+    #joinGroupPage .join-button .icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Notification Page Styles */
+    #notificationPage {
+      background-color: white;
+      color: black;
+    }
+    #notificationPage .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px;
+      border-bottom: 1px solid #ddd;
+    }
+    #notificationPage .top-bar .left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #notificationPage .top-bar .right {
+      color: red;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+    }
+    #notificationPage .main {
+      padding: 20px 16px;
+    }
+    #notificationPage .main h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+    }
+    #notificationPage .transaction {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    #notificationPage .transaction .left {
+      display: flex;
+      align-items: center;
+    }
+    #notificationPage .icon {
+      width: 36px;
+      height: 36px;
+      background-color: #d1fae5;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: green;
+      font-size: 20px;
+      margin-right: 12px;
+    }
+    #notificationPage .desc {
+      display: flex;
+      flex-direction: column;
+    }
+    #notificationPage .desc .title {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    #notificationPage .desc .time {
+      color: gray;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+    #notificationPage .amount {
+      color: green;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .withdrawal-details {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+      white-space: pre-wrap; /* Preserve line breaks */
+    }
+
+    /* BUY AIRTIME PAGE STYLES */
+    #airtimePage {
+      max-width: 430px;
+      width: 100%;
+      margin: auto;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f0f2f5;
+      min-height: 100vh;
+    }
+    #airtimePage .airtime-header {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #airtimePage .airtime-promo {
+      background-color: #9333ea;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    #airtimePage .airtime-promo span {
+      color: yellow;
+      font-weight: bold;
+    }
+    #airtimePage .airtime-go-button {
+      position: absolute;
+      right: 15px;
+      top: 15px;
+      background-color: yellow;
+      color: black;
+      padding: 6px 18px;
+      border-radius: 20px;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #airtimePage .airtime-networks {
+      display: flex;
+      justify-content: space-around;
+      margin: 15px 10px;
+    }
+    #airtimePage .airtime-network {
+      border-radius: 15px;
+      padding: 5px;
+      border: 3px solid transparent;
+      cursor: pointer;
+    }
+    #airtimePage .airtime-network.selected {
+      border: 3px solid green;
+    }
+    #airtimePage .airtime-network img {
+      width: 60px;
+      height: 60px;
+      border-radius: 15px;
+    }
+    #airtimePage input[type="text"] {
+      width: 90%;
+      margin: 15px auto;
+      padding: 12px;
+      display: block;
+      font-size: 16px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+    #airtimePage .airtime-amount-section {
+      text-align: left;
+      padding: 0 15px;
+      font-weight: bold;
+    }
+    #airtimePage .airtime-amounts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 10px 15px;
+    }
+    #airtimePage .airtime-amount {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+    #airtimePage .airtime-amount.selected {
+      border: 2px solid purple;
+      background-color: #f3e8ff;
+    }
+    #airtimePage .airtime-cashback {
+      color: gray;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    #airtimePage .airtime-buy-button {
+      width: 100%;
+      padding: 15px;
+      font-size
